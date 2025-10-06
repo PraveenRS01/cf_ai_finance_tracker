@@ -2,6 +2,19 @@
 
 A sophisticated AI-powered financial management application built with Cloudflare Agents, featuring Llama 3.3 integration, Durable Objects for state management, and a modern chat interface for natural language financial interactions.
 
+## Sample View
+
+Here's a glimpse of the AI Financial Tracker in action, showcasing the dashboard and chat interface:
+
+![AI Financial Tracker Screenshot](screenshot.png)
+
+The application features a clean, modern design with a header, a left-hand financial dashboard, and a prominent chat interface on the right. The color scheme primarily uses gradients of purple and blue for the background, with white cards and text, creating a professional and user-friendly aesthetic.
+
+**Key Interface Elements:**
+- **Header**: Displays "AI Financial Tracker" with a robot icon and tagline "Your intelligent personal finance assistant powered by Llama 3.3"
+- **Financial Dashboard (Left Sidebar)**: Shows "Financial Overview" with metrics like "Monthly Expenses: $505.00", "Upcoming Bills: $0.00", "Total Saved: $0.00", and "Net Worth: $-505.00". A "Recent Expenses" section lists transactions like "groceries" for "$5.00"
+- **Chat Interface (Right Main Content)**: Features "Chat with AI Assistant" with status "Ready". Shows AI welcome message listing capabilities and user interactions like "Show me my financial overview" with AI responses
+
 ## Features
 
 ### AI-Powered Financial Assistant
