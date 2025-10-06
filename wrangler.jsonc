@@ -1,0 +1,32 @@
+{
+  "name": "cf-ai-finance-tracker",
+  "main": "src/index.js",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "FinancialAgent",
+        "class_name": "FinancialAgent",
+        "script_name": "cf-ai-finance-tracker"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["FinancialAgent"]
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "env": {
+    "production": {
+      "name": "cf-ai-finance-tracker-prod"
+    },
+    "staging": {
+      "name": "cf-ai-finance-tracker-staging"
+    }
+  }
+}

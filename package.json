@@ -1,0 +1,31 @@
+{
+  "name": "cf-ai-finance-tracker",
+  "version": "1.0.0",
+  "description": "AI-powered Personal Financial Health Tracker using Cloudflare Agents",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "pages:dev": "wrangler pages dev public",
+    "pages:deploy": "wrangler pages deploy public",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "ai": "^5.0.60",
+    "wrangler": "^3.0.0",
+    "zod": "^3.25.76"
+  },
+  "keywords": [
+    "cloudflare",
+    "ai",
+    "agents",
+    "finance",
+    "tracker"
+  ],
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PraveenRS01/cf_ai_finance_tracker.git"
+  }
+}
