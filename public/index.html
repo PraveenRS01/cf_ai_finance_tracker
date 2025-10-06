@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Financial Health Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-robot"></i> AI Financial Tracker</h1>
+                <p>Your intelligent personal finance assistant powered by Llama 3.3</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Sidebar -->
+            <aside class="dashboard-sidebar">
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-chart-line"></i> Financial Overview</h3>
+                    <div class="metric">
+                        <span class="metric-label">Monthly Expenses</span>
+                        <span class="metric-value" id="monthly-expenses">$0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Upcoming Bills</span>
+                        <span class="metric-value" id="upcoming-bills">$0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Total Saved</span>
+                        <span class="metric-value" id="total-saved">$0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Net Worth</span>
+                        <span class="metric-value" id="net-worth">$0</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-receipt"></i> Recent Expenses</h3>
+                    <div id="recent-expenses" class="expense-list">
+                        <p class="no-data">No expenses yet</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-calendar-alt"></i> Upcoming Bills</h3>
+                    <div id="upcoming-bills-list" class="bills-list">
+                        <p class="no-data">No bills scheduled</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Chat Interface -->
+            <section class="chat-section">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h2><i class="fas fa-comments"></i> Chat with AI Assistant</h2>
+                        <div class="chat-status">
+                            <span class="status-indicator" id="status-indicator"></span>
+                            <span id="status-text">Ready</span>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message ai-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>Hello! I'm your AI financial assistant. I can help you:</p>
+                                <ul>
+                                    <li>Track expenses ("I spent $50 on groceries")</li>
+                                    <li>Add bills ("Add rent bill of $1200 due 2024-02-01")</li>
+                                    <li>Set savings goals ("Save $5000 for vacation by December 2024")</li>
+                                    <li>Get financial summaries ("Show me my financial overview")</li>
+                                </ul>
+                                <p>How can I help you today?</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="chat-input">
+                            <input type="text" id="message-input" placeholder="Type your message here... (e.g., 'I spent $50 on groceries')" autocomplete="off">
+                            <button id="send-button" class="send-button">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="quick-action" data-message="I spent $50 on groceries">
+                                <i class="fas fa-shopping-cart"></i> Add Expense
+                            </button>
+                            <button class="quick-action" data-message="Add rent bill of $1200 due 2024-02-01">
+                                <i class="fas fa-file-invoice"></i> Add Bill
+                            </button>
+                            <button class="quick-action" data-message="Save $5000 for vacation by 2024-12-31">
+                                <i class="fas fa-piggy-bank"></i> Savings Goal
+                            </button>
+                            <button class="quick-action" data-message="Show me my financial summary">
+                                <i class="fas fa-chart-pie"></i> Summary
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>AI is thinking...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

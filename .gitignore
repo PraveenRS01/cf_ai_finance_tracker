@@ -1,1 +1,7 @@
 node_modules
+.wrangler/
+*.log
+.env
+.env.local
+.env.production
+.env.staging

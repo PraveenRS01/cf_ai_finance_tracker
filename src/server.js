@@ -1,4 +1,4 @@
-// FinancialAgent without agents package (working version)
+// FinancialAgent with AI integration following agents-starter pattern
 export class FinancialAgent {
   constructor(state, env) {
     this.state = state;
@@ -21,72 +21,163 @@ export class FinancialAgent {
   }
 
   async handleChat(request) {
-    const { message } = await request.json();
-    
-    // Initialize database tables if they don't exist
-    await this.initializeDatabase();
-    
-    // Process the financial message and determine action
-    const response = await this.processFinancialMessage(message);
-    
-    return new Response(JSON.stringify(response), {
-      headers: { "Content-Type": "application/json" }
-    });
+    try {
+      // Check if request has a body
+      if (!request.body) {
+        return new Response(JSON.stringify({
+          message: "No message provided",
+          timestamp: new Date().toISOString()
+        }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+
+      const { message } = await request.json();
+      
+      if (!message) {
+        return new Response(JSON.stringify({
+          message: "Message is required",
+          timestamp: new Date().toISOString()
+        }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+      
+      // Initialize database tables if they don't exist
+      await this.initializeDatabase();
+      
+      // Process the financial message and determine action
+      const response = await this.processFinancialMessage(message);
+      
+      return new Response(JSON.stringify(response), {
+        headers: { "Content-Type": "application/json" }
+      });
+    } catch (error) {
+      console.error("Chat handler error:", error);
+      return new Response(JSON.stringify({
+        message: "Sorry, I encountered an error processing your request. Please try again.",
+        timestamp: new Date().toISOString()
+      }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
   }
 
   async processFinancialMessage(message) {
-    const lowerMessage = message.toLowerCase();
-    
-    // Parse financial commands using simple pattern matching
-    // This will be enhanced with AI in Step 5
-    
-    // Add expense patterns
-    if (lowerMessage.includes('add expense') || lowerMessage.includes('spent') || lowerMessage.includes('bought')) {
-      return await this.parseAddExpense(message);
+    try {
+      // Use AI to understand and process financial requests
+      // Using the correct Workers AI API
+      const aiResponse = await this.env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
+        messages: [
+          {
+            role: "system",
+            content: `You are a financial health assistant. Help users track expenses, manage bills, and set savings goals.
+
+Available actions:
+- add_expense: Add a new expense
+- add_bill: Add a recurring bill  
+- set_savings_goal: Set a savings target
+- get_summary: Get financial overview
+
+IMPORTANT: You must respond with ONLY valid JSON. No additional text or formatting.
+
+Example response:
+{"action": "add_expense", "parameters": {"amount": 50, "category": "food", "description": "groceries", "recurring": false}}`
+          },
+          {
+            role: "user",
+            content: message
+          }
+        ]
+      });
+
+      console.log("AI Response type:", typeof aiResponse.response);
+      console.log("AI Response:", aiResponse.response);
+      
+      let aiResult;
+      try {
+        // The AI response might be a string or already an object
+        if (typeof aiResponse.response === 'string') {
+          aiResult = JSON.parse(aiResponse.response);
+        } else {
+          // If it's already an object, use it directly
+          aiResult = aiResponse.response;
+        }
+      } catch (parseError) {
+        console.error("AI response parsing error:", parseError);
+        console.error("AI response:", aiResponse.response);
+        // Fallback to simple parsing if AI response is not valid JSON
+        return await this.fallbackParsing(message);
+      }
+      
+      // Execute the financial action based on AI analysis
+      switch (aiResult.action) {
+        case "add_expense":
+          return await this.executeAddExpense(aiResult.parameters);
+        case "add_bill":
+          return await this.executeAddBill(aiResult.parameters);
+        case "set_savings_goal":
+          return await this.executeSetSavingsGoal(aiResult.parameters);
+        case "get_summary":
+          return await this.executeGetSummary();
+        default:
+          return {
+            message: `I received: "${message}". I can help you:
+            - Add expenses (e.g., "I spent $50 on groceries")
+            - Add bills (e.g., "Add rent bill of $1200 due 2024-01-01")
+            - Set savings goals (e.g., "Save $5000 for vacation by 2024-12-31")
+            - Get financial summary (e.g., "Show me my financial summary")`,
+            timestamp: new Date().toISOString()
+          };
+      }
+    } catch (error) {
+      console.error("AI processing error:", error);
+      // Fallback to simple parsing if AI fails
+      return await this.fallbackParsing(message);
     }
-    
-    // Add bill patterns
-    if (lowerMessage.includes('add bill') || lowerMessage.includes('recurring bill') || lowerMessage.includes('due')) {
-      return await this.parseAddBill(message);
-    }
-    
-    // Set savings goal patterns
-    if (lowerMessage.includes('savings goal') || lowerMessage.includes('save') || lowerMessage.includes('target')) {
-      return await this.parseSetSavingsGoal(message);
-    }
-    
-    // Get summary patterns
-    if (lowerMessage.includes('summary') || lowerMessage.includes('overview') || lowerMessage.includes('how much')) {
-      return await this.getFinancialSummary();
-    }
-    
-    // Default response
-    return {
-      message: `I received: "${message}". I can help you:
-      - Add expenses (e.g., "I spent $50 on groceries")
-      - Add bills (e.g., "Add rent bill of $1200 due 2024-01-01")
-      - Set savings goals (e.g., "Save $5000 for vacation by 2024-12-31")
-      - Get financial summary (e.g., "Show me my financial summary")`,
-      timestamp: new Date().toISOString()
-    };
   }
 
   async handleFinancialData(request) {
-    await this.initializeDatabase();
-    
-    // Get basic financial data
-    const expenses = await this.getExpenses();
-    const bills = await this.getBills();
-    const savingsGoals = await this.getSavingsGoals();
-    
-    return new Response(JSON.stringify({
-      expenses,
-      bills,
-      savingsGoals,
-      summary: await this.getFinancialSummary()
-    }), {
-      headers: { "Content-Type": "application/json" }
-    });
+    try {
+      await this.initializeDatabase();
+      
+      // Get basic financial data
+      const expenses = await this.getExpenses();
+      const bills = await this.getBills();
+      const savingsGoals = await this.getSavingsGoals();
+      const summary = await this.getFinancialSummary();
+      
+      return new Response(JSON.stringify({
+        expenses,
+        bills,
+        savingsGoals,
+        summary,
+        timestamp: new Date().toISOString()
+      }), {
+        headers: { "Content-Type": "application/json" }
+      });
+    } catch (error) {
+      console.error("Financial data handler error:", error);
+      return new Response(JSON.stringify({
+        expenses: [],
+        bills: [],
+        savingsGoals: [],
+        summary: {
+          monthlyExpenses: 0,
+          upcomingBills: 0,
+          totalSaved: 0,
+          netWorth: 0
+        },
+        timestamp: new Date().toISOString(),
+        error: "Failed to load financial data"
+      }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
   }
 
   async initializeDatabase() {
@@ -151,7 +242,79 @@ export class FinancialAgent {
     };
   }
 
-  // Parse add expense command
+  // AI-powered execution methods
+  async executeAddExpense(parameters) {
+    const result = await this.executions.addExpense(parameters);
+    return {
+      message: result.message,
+      data: result.expense,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  async executeAddBill(parameters) {
+    const result = await this.executions.addBill(parameters);
+    return {
+      message: result.message,
+      data: result.bill,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  async executeSetSavingsGoal(parameters) {
+    const result = await this.executions.setSavingsGoal(parameters);
+    return {
+      message: result.message,
+      data: result.goal,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  async executeGetSummary() {
+    const summary = await this.getFinancialSummary();
+    return {
+      message: "Here's your financial summary:",
+      data: summary,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // Fallback parsing methods (kept for error handling)
+  async fallbackParsing(message) {
+    const lowerMessage = message.toLowerCase();
+    
+    // Add expense patterns
+    if (lowerMessage.includes('add expense') || lowerMessage.includes('spent') || lowerMessage.includes('bought')) {
+      return await this.parseAddExpense(message);
+    }
+    
+    // Add bill patterns
+    if (lowerMessage.includes('add bill') || lowerMessage.includes('recurring bill') || lowerMessage.includes('due')) {
+      return await this.parseAddBill(message);
+    }
+    
+    // Set savings goal patterns
+    if (lowerMessage.includes('savings goal') || lowerMessage.includes('save') || lowerMessage.includes('target')) {
+      return await this.parseSetSavingsGoal(message);
+    }
+    
+    // Get summary patterns
+    if (lowerMessage.includes('summary') || lowerMessage.includes('overview') || lowerMessage.includes('how much')) {
+      return await this.executeGetSummary();
+    }
+    
+    // Default response
+    return {
+      message: `I received: "${message}". I can help you:
+      - Add expenses (e.g., "I spent $50 on groceries")
+      - Add bills (e.g., "Add rent bill of $1200 due 2024-01-01")
+      - Set savings goals (e.g., "Save $5000 for vacation by 2024-12-31")
+      - Get financial summary (e.g., "Show me my financial summary")`,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // Parse add expense command (fallback)
   async parseAddExpense(message) {
     // Simple regex parsing - will be enhanced with AI in Step 5
     const amountMatch = message.match(/\$?(\d+(?:\.\d{2})?)/);
@@ -248,8 +411,13 @@ export class FinancialAgent {
     };
   }
 
-  // Helper methods for parsing
-  extractCategory(message) {
+      // Helper methods for parsing
+      extractAmount(message) {
+        const amountMatch = message.match(/\$?(\d+(?:\.\d{2})?)/);
+        return amountMatch ? parseFloat(amountMatch[1]) : null;
+      }
+
+      extractCategory(message) {
     const categories = ['food', 'groceries', 'transport', 'entertainment', 'utilities', 'rent', 'insurance', 'healthcare'];
     const lowerMessage = message.toLowerCase();
     

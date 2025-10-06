@@ -6,12 +6,15 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "pages:dev": "wrangler pages dev public",
+    "pages:dev": "wrangler pages dev public --compatibility-date=2024-09-23",
     "pages:deploy": "wrangler pages deploy public",
-    "start": "npm run dev"
+    "start": "npm run dev",
+    "frontend:dev": "npm run pages:dev",
+    "frontend:deploy": "npm run pages:deploy"
   },
   "dependencies": {
     "ai": "^5.0.60",
+    "workers-ai-provider": "^2.0.0",
     "wrangler": "^3.0.0",
     "zod": "^3.25.76"
   },
